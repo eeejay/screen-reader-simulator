@@ -16,11 +16,6 @@ function ScreenReader() {
 ScreenReader.prototype = {
   toggle: function toggle(enabled) {
     Services.prefs.setIntPref(ACTIVATE_PREF, enabled ? 1 : 0);
-    if (tab.navigator.mozSettings) {
-      var lock = tab.navigator.mozSettings.createLock();
-      lock.set({'accessibility.screenreader': enabled});
-    }
-
     if (enabled) {
       if (Services.prefs.prefHasUserValue(OUTPUT_NOTIFY_PREF)) {
         this._previousOutputPref = Services.prefs.getBoolPref(OUTPUT_NOTIFY_PREF);

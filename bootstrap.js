@@ -24,10 +24,25 @@ function debug(data) {
   dump('screen-reader-simulator: ' + data + '\n');
 }
 
+function setScreenreaderSetting(aValue) {
+  if (gBrowserWindow && gBrowserWindow.navigator.mozSettings) {
+    let lock = gBrowserWindow.navigator.mozSettings.createLock();
+    lock.set({'accessibility.screenreader' : aValue});
+  }
+}
+
+function onPrefChanged(aSubject, aTopic, aData) {
+  var value = aSubject.QueryInterface(Ci.nsIPrefBranch).
+    getIntPref('accessibility.accessfu.activate');
+  setScreenreaderSetting(value != 0);
+}
+
 function startup(data, reason) {
   function setupWindow() {
     Services.prefs.setIntPref('accessibility.accessfu.activate', 0);
+    setScreenreaderSetting(false);
     AccessFu.attach(gBrowserWindow);
+    Services.prefs.addObserver('accessibility.accessfu.activate', onPrefChanged, false);
   }
 
   try {
@@ -70,7 +85,9 @@ function startup(data, reason) {
 function shutdown(data, reason) {
   try {
     gDevTools.unregisterTool('screen-reader-controls');
+    Services.prefs.removeObserver('accessibility.accessfu.activate', onPrefChanged);
     Services.prefs.setIntPref('accessibility.accessfu.activate', 0);
+    setScreenreaderSetting(false);
     AccessFu.detach(gBrowserWindow);
   } catch (e) {
     debug('Something went wrong while trying to stop: ' + e);
