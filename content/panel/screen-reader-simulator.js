@@ -74,19 +74,19 @@ ScreenReader.prototype = {
   },
 
   scrollLeft: function scrollLeft() {
-    AccessFu.Input.scroll(1, true);
-  },
-
-  scrollRight: function scrollRight() {
     AccessFu.Input.scroll(-1, true);
   },
 
+  scrollRight: function scrollRight() {
+    AccessFu.Input.scroll(1, true);
+  },
+
   scrollUp: function scrollUp() {
-    AccessFu.Input.scroll(1);
+    AccessFu.Input.scroll(-1);
   },
 
   scrollDown: function scrollDown() {
-    AccessFu.Input.scroll(-1);
+    AccessFu.Input.scroll(1);
   },
 
   _speechService: null
