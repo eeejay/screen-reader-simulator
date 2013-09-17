@@ -31,18 +31,11 @@ function setScreenreaderSetting(aValue) {
   }
 }
 
-function onPrefChanged(aSubject, aTopic, aData) {
-  var value = aSubject.QueryInterface(Ci.nsIPrefBranch).
-    getIntPref('accessibility.accessfu.activate');
-  setScreenreaderSetting(value != 0);
-}
-
 function startup(data, reason) {
   function setupWindow() {
-    Services.prefs.setIntPref('accessibility.accessfu.activate', 0);
     setScreenreaderSetting(false);
+    Services.prefs.setIntPref('accessibility.accessfu.activate', 2);
     AccessFu.attach(gBrowserWindow);
-    Services.prefs.addObserver('accessibility.accessfu.activate', onPrefChanged, false);
   }
 
   try {
@@ -85,7 +78,6 @@ function startup(data, reason) {
 function shutdown(data, reason) {
   try {
     gDevTools.unregisterTool('screen-reader-controls');
-    Services.prefs.removeObserver('accessibility.accessfu.activate', onPrefChanged);
     Services.prefs.setIntPref('accessibility.accessfu.activate', 0);
     setScreenreaderSetting(false);
     AccessFu.detach(gBrowserWindow);

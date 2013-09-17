@@ -10,12 +10,45 @@ const ACTIVATE_PREF = 'accessibility.accessfu.activate';
 
 function ScreenReader() {
   Components.utils.import("resource://gre/modules/accessibility/AccessFu.jsm");
+  Components.utils.import("resource://gre/modules/accessibility/Utils.jsm");
   Components.utils.import('resource://gre/modules/Services.jsm');
+
+  window.document.addEventListener(
+    'DOMContentLoaded',
+    function (e) {
+      if (Utils.win && Utils.win.navigator.mozSettings) {
+        var toggleButton = window.document.getElementById('screenreader-toggle');
+        this.settings = Utils.win.navigator.mozSettings;
+        var lock = this.settings.createLock();
+        var req;
+        req = lock.get('accessibility.screenreader').onsuccess = function () {
+          toggleButton.checked = !!req.result['accessibility.screenreader'];
+        }
+        this.settings.addObserver(
+          'accessibility.screenreader',
+          function (evt) {
+            toggleButton.checked = !!evt.settingValue;
+          });
+      } else {
+        function onPrefChanged(aSubject, aTopic, aData) {
+          var value = aSubject.QueryInterface(Ci.nsIPrefBranch).
+            getIntPref('accessibility.accessfu.activate');
+          toggleButton.checked = value == 1;
+        }
+        Services.prefs.addObserver('accessibility.accessfu.activate', onPrefChanged, false);
+      }
+    }.bind(this));
 }
 
 ScreenReader.prototype = {
   toggle: function toggle(enabled) {
-    Services.prefs.setIntPref(ACTIVATE_PREF, enabled ? 1 : 0);
+    if (this.settings) {
+      var lock = this.settings.createLock();
+      lock.set({'accessibility.screenreader' : enabled});
+    } else {
+      Services.prefs.setIntPref(ACTIVATE_PREF, enabled ? 1 : 0);
+    }
+
     if (enabled) {
       if (Services.prefs.prefHasUserValue(OUTPUT_NOTIFY_PREF)) {
         this._previousOutputPref = Services.prefs.getBoolPref(OUTPUT_NOTIFY_PREF);

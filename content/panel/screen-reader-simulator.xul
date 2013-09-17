@@ -19,6 +19,7 @@
     <vbox flex="1">
       <toolbar class="devtools-toolbar">
         <toolbarbutton class="devtools-toolbarbutton" type="checkbox"
+                       id="screenreader-toggle"
                        oncommand="screenReader.toggle(this.checked)"
                        label="&screenReaderEnable;" tabindex="0"/>
         <toolbarspacer/>
