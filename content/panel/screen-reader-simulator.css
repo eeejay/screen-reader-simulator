@@ -26,19 +26,69 @@
   -moz-appearance: none;
   border-bottom: 1px solid ThreeDShadow;
   margin: 0;
-  font-size: 0.9em;
+  font-size: 1rem;
 }
 
-#previous-item {
-  list-style-image: url("control-item-left.png");
+#sr-output richlistitem { 
+  margin-left: 3px;
 }
 
-#activate-item {
-  list-style-image: url("control-activate.png");
+#sr-output .speech {
+  font-style: italic;
 }
 
-#next-item {
-  list-style-image: url("control-item-right.png");
+#sr-output .speech:before { 
+  content: "Speak: ";
+  font-weight: bold;
+  font-style: normal;
+}
+
+#sr-output .logMessage { 
+  white-space: pre;
+}
+
+#sr-output .debugMessage { 
+  color: #555;
+}
+
+#sr-output .infoMessage { 
+  color: #333;
+}
+
+#sr-output .warningMessage { 
+  color: orange;
+}
+
+#sr-output .errorMessage { 
+  color: red;
+}
+
+#single-finger button { 
+  list-style-image: url("single-finger-icons.png");
+}
+
+#double-finger button { 
+  list-style-image: url("double-finger-icons.png");
+}
+
+button.swipe-up { 
+  -moz-image-region: rect(0px, 16px, 16px, 0px);
+}
+
+button.swipe-right { 
+  -moz-image-region: rect(0px, 32px, 16px, 16px);
+}
+
+button.swipe-down { 
+  -moz-image-region: rect(0px, 48px, 16px, 32px);
+}
+
+button.swipe-left { 
+  -moz-image-region: rect(0px, 64px, 16px, 48px);
+}
+
+button.double-tap { 
+  -moz-image-region: rect(0px, 80px, 16px, 64px);
 }
 
 #scroll-left {
@@ -55,4 +105,25 @@
 
 #scroll-down {
   list-style-image: url("control-scroll-down.png");
+}
+
+menulist { 
+  background-color: red;
+}
+
+grid > rows > row > spacer, button.devtools-toolbarbutton { 
+  min-width: 0 !important;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  margin: 0;
+}
+
+grid > column { 
+  min-width: 0;
+  width: 32px;
+}
+
+#sr-sidebar toolbarspacer { 
+  height: 15px;
 }

@@ -22,7 +22,7 @@ function ScreenReader() {
         var lock = this.settings.createLock();
         var req;
         req = lock.get('accessibility.screenreader').onsuccess = function () {
-          toggleButton.checked = !!req.result['accessibility.screenreader'];
+          toggleButton.checked = req.result && !!req.result['accessibility.screenreader'];
         }
         this.settings.addObserver(
           'accessibility.screenreader',
@@ -57,6 +57,8 @@ ScreenReader.prototype = {
       }
       Services.prefs.setBoolPref(OUTPUT_NOTIFY_PREF, true);
       Services.obs.addObserver(this, 'accessfu-output', false);
+      Logger.test = true;
+      Services.console.registerListener(this);
     } else {
       if (this._previousOutputPref == undefined) {
         Services.prefs.clearUserPref(OUTPUT_NOTIFY_PREF);
@@ -64,6 +66,8 @@ ScreenReader.prototype = {
         Services.prefs.setBoolPref(OUTPUT_NOTIFY_PREF, false);
       }
       Services.obs.removeObserver(this, 'accessfu-output');
+      Logger.test = false;
+      Services.console.unregisterListener(this);
     }
   },
 
@@ -71,6 +75,14 @@ ScreenReader.prototype = {
   },
 
   observe: function observe(aSubject, aTopic, aData) {
+    if (aSubject instanceof Components.interfaces.nsIConsoleMessage) {
+      var message = aSubject.message;
+      var match = /\[AccessFu\]\s(\S+)\s([\s\S]*)/.exec(message);
+      if (match)
+        this._log(match[2], ['logMessage', match[1].toLowerCase() + 'Message']);
+      return;
+    }
+
     if (aTopic != 'accessfu-output')
       return;
 
@@ -85,41 +97,57 @@ ScreenReader.prototype = {
 
         for (var ii in actions) {
           if (actions[ii].method == 'speak') {
-            var output = window.document.getElementById('sr-output');
-            var item = output.appendItem(actions[ii].data);
-            output.ensureElementIsVisible(item);
+            this._log(actions[ii].data, ['speech']);
           }
         }
       }
     }
   },
 
-  next: function next() {
-    AccessFu.Input.moveCursor('moveNext', 'Simple', 'gesture');
+  _log: function _log(aMessage, aClasses) {
+    var output = window.document.getElementById('sr-output');
+    var span = window.document.createElement('richlistitem');
+    span.innerHTML = aMessage;
+    for (var i in aClasses) {
+      span.classList.add(aClasses[i]);
+    }
+    var item = output.appendChild(span);
+    output.ensureElementIsVisible(item);
   },
 
-  previous: function previous() {
-    AccessFu.Input.moveCursor('movePrevious', 'Simple', 'gesture');
+  swipeRight: function swipeRight(aFingerNum) {
+    this._emitGesture({x1: 0, x2: 100, y1: 0, y2: 0, type: 'swiperight'}, aFingerNum);
   },
 
-  activate: function activate() {
-    AccessFu.Input.activateCurrent();
+  swipeLeft: function swipeLeft(aFingerNum) {
+    this._emitGesture({x1: 100, x2: 0, y1: 0, y2: 0, type: 'swipeleft'}, aFingerNum);
   },
 
-  scrollLeft: function scrollLeft() {
-    AccessFu.Input.scroll(-1, true);
+  swipeUp: function swipeUp(aFingerNum) {
+    this._emitGesture({x1: 0, x2: 0, y1: 100, y2: 0, type: 'swipeup'}, aFingerNum);
   },
 
-  scrollRight: function scrollRight() {
-    AccessFu.Input.scroll(1, true);
+  swipeDown: function swipeDown(aFingerNum) {
+    this._emitGesture({x1: 0, x2: 0, y1: 0, y2: 100, type: 'swipedown'}, aFingerNum);
   },
 
-  scrollUp: function scrollUp() {
-    AccessFu.Input.scroll(-1);
+  doubleTap: function doubleTap(aFingerNum) {
+    this._emitGesture({x1: 0, x2: 0, y1: 0, y2: 0, type: 'doubletap'}, aFingerNum);
   },
 
-  scrollDown: function scrollDown() {
-    AccessFu.Input.scroll(1);
+  _emitGesture: function _emitGesture(aDetails, aFingerNum) {
+    let details = {touches: []};
+    for (let detail in aDetails)
+      details[detail] = aDetails[detail];
+    for (var i = 0; i < aFingerNum; i++)
+      details.touches.push(i);
+    let evt = Utils.win.document.createEvent('CustomEvent');
+    evt.initCustomEvent('mozAccessFuGesture', true, true, details);
+    Utils.win.dispatchEvent(evt);
+  },
+
+  loggingChanged: function loggingChanged(aMenuList) {
+    Logger.logLevel = aMenuList.selectedIndex;
   },
 
   _speechService: null

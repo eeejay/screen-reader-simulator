@@ -1,13 +1,20 @@
 <!ENTITY screenReaderEnable "Enable">
 
-<!ENTITY screenReaderNavigationLabel "Navigation:">
-<!ENTITY screenReaderPreviousItem "Previous Item">
-<!ENTITY screenReaderActivateItem "Activate Item">
-<!ENTITY screenReaderNextItem "Next Item">
+<!ENTITY screenReaderOneFinger "One Finger">
+<!ENTITY screenReaderOneFingerSwipeUp "Swipe up with one finger">
+<!ENTITY screenReaderOneFingerSwipeDown "Swipe down with one finger">
+<!ENTITY screenReaderOneFingerSwipeLeft "Swipe left with one finger">
+<!ENTITY screenReaderOneFingerSwipeRight "Swipe right with one finger">
+<!ENTITY screenReaderOneFingerDoubleTap "Double tap with one finger">
 
-<!ENTITY screenReaderScrollLabel "Scroll:">
-<!ENTITY screenReaderScrollLeft "Scroll Left">
-<!ENTITY screenReaderScrollRight "Scroll Right">
-<!ENTITY screenReaderScrollUp "Scroll Up">
-<!ENTITY screenReaderScrollDown "Scroll Down">
+<!ENTITY screenReaderTwoFinger "Two Finger">
+<!ENTITY screenReaderTwoFingerSwipeUp "Swipe up with two finger">
+<!ENTITY screenReaderTwoFingerSwipeDown "Swipe down with two finger">
+<!ENTITY screenReaderTwoFingerSwipeLeft "Swipe left with two finger">
+<!ENTITY screenReaderTwoFingerSwipeRight "Swipe right with two finger">
 
+<!ENTITY screenReaderLogging "Logging">
+<!ENTITY screenReaderLoggingDebug "Debug">
+<!ENTITY screenReaderLoggingInfo "Info">
+<!ENTITY screenReaderLoggingWarning "Warning">
+<!ENTITY screenReaderLoggingError "Error">
