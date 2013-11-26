@@ -13,9 +13,12 @@
 
 <window xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-<script src="screen-reader-simulator.js"></script>
+  <script type="application/javascript;version=1.8"
+          src="chrome://browser/content/devtools/theme-switching.js"/>
 
-  <box flex="1" class="devtools-responsive-container">
+  <script src="screen-reader-simulator.js"></script>
+
+  <box flex="1" class="devtools-responsive-container theme-body">
     <hbox flex="1">
     <toolbar class="devtools-toolbar" id="sr-sidebar"
              style="-moz-box-align: center; -moz-box-orient: vertical;">
