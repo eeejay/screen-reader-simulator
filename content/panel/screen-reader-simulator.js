@@ -107,7 +107,7 @@ ScreenReader.prototype = {
   _log: function _log(aMessage, aClasses) {
     var output = window.document.getElementById('sr-output');
     var span = window.document.createElement('richlistitem');
-    span.innerHTML = aMessage;
+    span.textContent = aMessage;
     for (var i in aClasses) {
       span.classList.add(aClasses[i]);
     }
