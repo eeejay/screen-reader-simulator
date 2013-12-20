@@ -3,10 +3,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-!function() {
-
-const OUTPUT_NOTIFY_PREF = 'accessibility.accessfu.notify_output';
 const ACTIVATE_PREF = 'accessibility.accessfu.activate';
+
+!function() {
 
 function ScreenReader() {
   Components.utils.import("resource://gre/modules/accessibility/AccessFu.jsm");
@@ -16,26 +15,30 @@ function ScreenReader() {
   window.document.addEventListener(
     'DOMContentLoaded',
     function (e) {
+      Services.prefs.addObserver('accessibility.accessfu.activate', this.onPrefChanged, false);
+      Services.obs.addObserver(this, 'accessfu-output', false);
+      Services.console.registerListener(this);
+
       if (Utils.win && Utils.win.navigator.mozSettings) {
-        var toggleButton = window.document.getElementById('screenreader-toggle');
         this.settings = Utils.win.navigator.mozSettings;
         var lock = this.settings.createLock();
         var req;
         req = lock.get('accessibility.screenreader').onsuccess = function () {
-          toggleButton.checked = req.result && !!req.result['accessibility.screenreader'];
+          window.document.getElementById('screenreader-toggle').checked =
+            req.result && !!req.result['accessibility.screenreader'];
         }
-        this.settings.addObserver(
-          'accessibility.screenreader',
-          function (evt) {
-            toggleButton.checked = !!evt.settingValue;
-          });
-      } else {
-        function onPrefChanged(aSubject, aTopic, aData) {
-          var value = aSubject.QueryInterface(Ci.nsIPrefBranch).
-            getIntPref('accessibility.accessfu.activate');
-          toggleButton.checked = value == 1;
-        }
-        Services.prefs.addObserver('accessibility.accessfu.activate', onPrefChanged, false);
+        this.settings.addObserver('accessibility.screenreader', this.onSettingsChanged);
+      }
+    }.bind(this));
+
+  window.document.addEventListener(
+    'beforeunload', 
+    function (e) {
+      Services.obs.removeObserver(this, 'accessfu-output');
+      Services.console.unregisterListener(this);
+      Services.prefs.removeObserver('accessibility.accessfu.activate', this.onPrefChanged);
+      if (this.settings) {
+        this.settings.removeObserver('accessibility.screenreader', this.onSettingsChanged);
       }
     }.bind(this));
 }
@@ -47,27 +50,6 @@ ScreenReader.prototype = {
       lock.set({'accessibility.screenreader' : enabled});
     } else {
       Services.prefs.setIntPref(ACTIVATE_PREF, enabled ? 1 : 0);
-    }
-
-    if (enabled) {
-      if (Services.prefs.prefHasUserValue(OUTPUT_NOTIFY_PREF)) {
-        this._previousOutputPref = Services.prefs.getBoolPref(OUTPUT_NOTIFY_PREF);
-      } else {
-        delete this._previousOutputPref;
-      }
-      Services.prefs.setBoolPref(OUTPUT_NOTIFY_PREF, true);
-      Services.obs.addObserver(this, 'accessfu-output', false);
-      Logger.test = true;
-      Services.console.registerListener(this);
-    } else {
-      if (this._previousOutputPref == undefined) {
-        Services.prefs.clearUserPref(OUTPUT_NOTIFY_PREF);
-      } else if (!this._previousOutputPref){
-        Services.prefs.setBoolPref(OUTPUT_NOTIFY_PREF, false);
-      }
-      Services.obs.removeObserver(this, 'accessfu-output');
-      Logger.test = false;
-      Services.console.unregisterListener(this);
     }
   },
 
@@ -102,6 +84,16 @@ ScreenReader.prototype = {
         }
       }
     }
+  },
+
+  onSettingsChanged: function onSettingsChanged(event) {
+    window.document.getElementById('screenreader-toggle').checked = !!event.settingValue;
+  },
+
+  onPrefChanged: function onPrefChanged(aSubject, aTopic, aData) {
+    var value = aSubject.QueryInterface(Ci.nsIPrefBranch).
+      getIntPref('accessibility.accessfu.activate');
+    window.document.getElementById('screenreader-toggle').checked = value == 1;
   },
 
   _log: function _log(aMessage, aClasses) {
@@ -152,6 +144,7 @@ ScreenReader.prototype = {
 
   _speechService: null
 };
+
 window.screenReader = new ScreenReader();
 
 }();

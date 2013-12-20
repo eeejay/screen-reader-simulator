@@ -15,10 +15,15 @@ XPCOMUtils.defineLazyModuleGetter(this, "Services",
                                   "resource://gre/modules/Services.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "AccessFu",
                                   "resource://gre/modules/accessibility/AccessFu.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "Logger",
+                                  "resource://gre/modules/accessibility/Utils.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "gDevTools",
                                   "resource:///modules/devtools/gDevTools.jsm");
 
 var gBrowserWindow = null;
+
+const OUTPUT_NOTIFY_PREF = 'accessibility.accessfu.notify_output';
+const ACTIVATE_PREF = 'accessibility.accessfu.activate';
 
 function debug(data) {
   dump('screen-reader-simulator: ' + data + '\n');
@@ -34,7 +39,9 @@ function setScreenreaderSetting(aValue) {
 function startup(data, reason) {
   function setupWindow() {
     setScreenreaderSetting(false);
-    Services.prefs.setIntPref('accessibility.accessfu.activate', 2);
+    Services.prefs.setIntPref(ACTIVATE_PREF, 2);
+    Services.prefs.setBoolPref(OUTPUT_NOTIFY_PREF, true);
+    Logger.test = true;
     AccessFu.attach(gBrowserWindow);
   }
 
@@ -78,7 +85,9 @@ function startup(data, reason) {
 function shutdown(data, reason) {
   try {
     gDevTools.unregisterTool('screen-reader-controls');
-    Services.prefs.setIntPref('accessibility.accessfu.activate', 0);
+    Services.prefs.clearUserPref(ACTIVATE_PREF);
+    Services.prefs.clearUserPref(OUTPUT_NOTIFY_PREF);
+
     setScreenreaderSetting(false);
     AccessFu.detach(gBrowserWindow);
   } catch (e) {
