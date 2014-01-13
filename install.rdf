@@ -6,7 +6,7 @@
   <Description about="urn:mozilla:install-manifest">
     <em:id>screen-reader-simulator@gaiamobile.org</em:id>
     <em:name>screen-reader-simulator</em:name>
-    <em:version>0.6</em:version>
+    <em:version>0.7</em:version>
     <em:type>2</em:type>
     <em:iconURL>chrome://screen-reader-simulator/content/logo.png</em:iconURL>
     <em:targetApplication>
