@@ -64,6 +64,7 @@ function startup(data, reason) {
         key: 'V',
         modifiers: 'accel,shift',
         icon: 'chrome://screen-reader-simulator/content/panel/icon.png',
+        invertIconForLightTheme: true,
         url: 'chrome://screen-reader-simulator/content/panel/screen-reader-simulator.xul',
         label: 'Screen Reader',
         tooltip: 'Control the mobile screen reader',
