@@ -59,6 +59,10 @@ ScreenReader.prototype = {
   observe: function observe(aSubject, aTopic, aData) {
     if (aSubject instanceof Components.interfaces.nsIConsoleMessage) {
       var message = aSubject.message;
+      // suppress SpeechSynthesisUtterance contructor error in FF 29.
+      if (Services.appinfo.version.indexOf('29.0') === 0 &&
+          message.indexOf('SpeechSynthesisUtterance is not a constructor') >= 0)
+        return;
       var match = /\[AccessFu\]\s(\S+)\s([\s\S]*)/.exec(message);
       if (match)
         this._log(match[2], ['logMessage', match[1].toLowerCase() + 'Message']);
@@ -91,7 +95,7 @@ ScreenReader.prototype = {
   },
 
   onPrefChanged: function onPrefChanged(aSubject, aTopic, aData) {
-    var value = aSubject.QueryInterface(Ci.nsIPrefBranch).
+    var value = aSubject.QueryInterface(Components.interfaces.nsIPrefBranch).
       getIntPref('accessibility.accessfu.activate');
     window.document.getElementById('screenreader-toggle').checked = value == 1;
   },
