@@ -19,15 +19,19 @@ function ScreenReader() {
       Services.obs.addObserver(this, 'accessfu-output', false);
       Services.console.registerListener(this);
 
-      if (Utils.win && Utils.win.navigator.mozSettings) {
-        this.settings = Utils.win.navigator.mozSettings;
-        var lock = this.settings.createLock();
-        var req;
-        req = lock.get('accessibility.screenreader').onsuccess = function () {
-          window.document.getElementById('screenreader-toggle').checked =
+      if (Utils.win) {
+        // We intercept accessfu-output events
+        Utils.win.addEventListener('mozChromeEvent', this);
+        if (Utils.win.navigator.mozSettings) {
+          this.settings = Utils.win.navigator.mozSettings;
+          var lock = this.settings.createLock();
+          var req;
+          req = lock.get('accessibility.screenreader').onsuccess = function () {
+            window.document.getElementById('screenreader-toggle').checked =
             req.result && !!req.result['accessibility.screenreader'];
+          }
+          this.settings.addObserver('accessibility.screenreader', this.onSettingsChanged);
         }
-        this.settings.addObserver('accessibility.screenreader', this.onSettingsChanged);
       }
     }.bind(this));
 
@@ -88,6 +92,12 @@ ScreenReader.prototype = {
         }
       }
     }
+  },
+
+  handleEvent: function handleEvent(aEvent) {
+    if (aEvent.detail.type !== 'accessfu-output') return;
+    var details = JSON.parse(aEvent.detail.details);
+    this._log(Utils.localize(details.data).join(' '), ['speech']);
   },
 
   onSettingsChanged: function onSettingsChanged(event) {
