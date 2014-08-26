@@ -95,7 +95,8 @@ ScreenReader.prototype = {
   },
 
   handleEvent: function handleEvent(aEvent) {
-    if (aEvent.detail.type !== 'accessfu-output') return;
+    if (aEvent.detail.type !== 'accessfu-output' ||
+        aEvent.detail.type !== 'accessibility-output') return;
     var details = JSON.parse(aEvent.detail.details);
     this._log(Utils.localize(details.data).join(' '), ['speech']);
   },
