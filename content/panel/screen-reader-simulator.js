@@ -73,7 +73,7 @@ ScreenReader.prototype = {
       return;
     }
 
-    if (aTopic != 'accessfu-output')
+    if (aTopic != 'accessfu-output') 
       return;
 
     var data = JSON.parse(aData);
